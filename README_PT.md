@@ -1,12 +1,12 @@
 # 🚀 Kafka CDC Analytics Platform
 
-A Change Data Capture (CDC) platform built with PostgreSQL, Debezium, Apache Kafka, and PostgreSQL Analytics.
+Plataforma de captura de mudanças em banco de dados (CDC - Change Data Capture) utilizando PostgreSQL, Debezium, Apache Kafka e PostgreSQL Analytics.
 
-This project demonstrates an event-driven architecture capable of capturing database changes in real time, streaming them through Kafka, and storing them in an analytical database for further processing and reporting.
+O projeto demonstra uma arquitetura orientada a eventos capaz de capturar alterações em tempo real de uma tabela PostgreSQL, publicar eventos no Kafka e persisti-los em uma base analítica.
 
 ---
 
-# 📐 Architecture
+# 📐 Arquitetura
 
 ```text
 PostgreSQL (OLTP)
@@ -16,7 +16,7 @@ PostgreSQL (OLTP)
     Debezium
         │
         ▼
-      Kafka
+     Kafka
         │
         ▼
  Python Consumer
@@ -27,11 +27,11 @@ PostgreSQL Analytics
 
 ---
 
-# 🛠 Technologies
+# 🛠 Tecnologias Utilizadas
 
 - PostgreSQL 15
 - Apache Kafka
-- Apache Zookeeper
+- Zookeeper
 - Debezium
 - Kafka Connect
 - Schema Registry
@@ -42,7 +42,7 @@ PostgreSQL Analytics
 
 ---
 
-# 📂 Project Structure
+# 📂 Estrutura do Projeto
 
 ```text
 kafka-cdc-platform/
@@ -83,53 +83,53 @@ kafka-cdc-platform/
 
 ---
 
-# 🎯 Project Goal
+# 🎯 Objetivo
 
-Capture changes from the following PostgreSQL table:
+Capturar alterações realizadas na tabela:
 
 ```sql
 public.users
 ```
 
-and transform them into Kafka events using Debezium.
+e transformá-las em eventos Kafka através do Debezium.
 
-These events are consumed by a Python application and stored in an analytics database for auditing, reporting, and real-time data processing.
+Os eventos são consumidos por uma aplicação Python que grava todas as operações em uma base analítica.
 
 ---
 
-# 🔄 Data Flow
+# 🔄 Fluxo dos Dados
 
-### 1. Insert or Update Data
+### 1. Inserção/Atualização no PostgreSQL
 
 ```sql
-INSERT INTO users(name, email)
-VALUES ('John Doe', 'john@example.com');
+INSERT INTO users(name,email)
+VALUES ('João','joao@email.com');
 ```
 
-### 2. Debezium Captures the Change
+### 2. Debezium captura a alteração
 
-Debezium monitors PostgreSQL's Write-Ahead Log (WAL) and detects database changes.
+O Debezium monitora o WAL (Write Ahead Log) do PostgreSQL.
 
-### 3. Event Published to Kafka
+### 3. Evento publicado no Kafka
 
-Topic:
+Tópico:
 
 ```text
 cdc.public.users
 ```
 
-### 4. Python Consumer Processes the Event
+### 4. Consumer processa o evento
 
-The consumer application:
+A aplicação Python:
 
-- Reads messages from Kafka
-- Identifies the operation type (Create, Update, Delete)
-- Extracts relevant payload data
-- Persists the event into the analytics database
+- Consome mensagens Kafka
+- Identifica a operação (Insert, Update ou Delete)
+- Extrai os dados relevantes
+- Persiste em PostgreSQL Analytics
 
-### 5. Event Stored for Analytics
+### 5. Evento armazenado
 
-Target table:
+Tabela:
 
 ```sql
 cdc_events
@@ -137,33 +137,33 @@ cdc_events
 
 ---
 
-# 📦 Docker Services
+# 📦 Serviços Docker
 
-The Docker environment automatically starts:
+O ambiente sobe automaticamente:
 
-| Service | Port |
+| Serviço | Porta |
 |----------|---------|
 | PostgreSQL CDC | 5432 |
 | PostgreSQL Analytics | 5433 |
-| Kafka Broker | 9092 |
+| Kafka | 9092 |
 | Zookeeper | 2181 |
 | Schema Registry | 8081 |
 | Kafka Connect | 8083 |
 
 ---
 
-# 🚀 Getting Started
+# 🚀 Como Executar
 
-## 1. Clone the Repository
+## 1. Clonar o projeto
 
 ```bash
-git clone <repository-url>
+git clone <repo-url>
 cd kafka-cdc-platform
 ```
 
 ---
 
-## 2. Start the Infrastructure
+## 2. Subir infraestrutura
 
 ```bash
 cd docker
@@ -171,7 +171,7 @@ cd docker
 docker compose up -d
 ```
 
-Verify all containers are running:
+Verificar containers:
 
 ```bash
 docker ps
@@ -179,9 +179,9 @@ docker ps
 
 ---
 
-## 3. Register the Debezium Connector
+## 3. Registrar Connector Debezium
 
-If not automatically registered:
+Caso não seja realizado automaticamente:
 
 ```bash
 curl -X POST http://localhost:8083/connectors \
@@ -191,7 +191,9 @@ curl -X POST http://localhost:8083/connectors \
 
 ---
 
-## 4. Start the Consumer
+## 4. Executar Consumer
+
+Dentro do container Python:
 
 ```bash
 python src/consumer/cli.py
@@ -199,30 +201,30 @@ python src/consumer/cli.py
 
 ---
 
-# 🧪 Testing CDC
+# 🧪 Testando CDC
 
-Connect to PostgreSQL:
+Conecte no PostgreSQL principal:
 
 ```bash
 docker exec -it postgres_cdc psql -U postgres -d app_db
 ```
 
-Create a record:
+Inserir registro:
 
 ```sql
 INSERT INTO users(name,email)
-VALUES ('Maria','maria@example.com');
+VALUES ('Maria','maria@email.com');
 ```
 
-Update a record:
+Atualizar:
 
 ```sql
 UPDATE users
-SET email='updated@example.com'
+SET email='novo@email.com'
 WHERE id=1;
 ```
 
-Delete a record:
+Excluir:
 
 ```sql
 DELETE FROM users
@@ -231,7 +233,7 @@ WHERE id=1;
 
 ---
 
-# 📥 Sample Debezium Event
+# 📥 Exemplo de Evento Debezium
 
 ```json
 {
@@ -240,7 +242,7 @@ WHERE id=1;
     "after": {
       "id": 1,
       "name": "Maria",
-      "email": "maria@example.com"
+      "email": "maria@email.com"
     },
     "op": "c",
     "source": {
@@ -252,15 +254,15 @@ WHERE id=1;
 
 ---
 
-# 📊 Analytics Database
+# 📊 Base Analítica
 
-All captured events are stored in:
+Todos os eventos são persistidos na tabela:
 
 ```sql
 cdc_events
 ```
 
-Schema example:
+Estrutura:
 
 ```sql
 CREATE TABLE cdc_events (
@@ -275,10 +277,10 @@ CREATE TABLE cdc_events (
 
 ---
 
-# 🔍 Captured Operations
+# 🔍 Operações Capturadas
 
-| Code | Operation |
-|--------|-----------|
+| Código | Operação |
+|----------|-----------|
 | c | Create |
 | u | Update |
 | d | Delete |
@@ -286,44 +288,26 @@ CREATE TABLE cdc_events (
 
 ---
 
-# ✨ Future Improvements
+# 📈 Possíveis Evoluções
 
-- Grafana dashboards
-- Real-time monitoring
-- Full Avro serialization support
-- Advanced Schema Registry integration
+- Integração com Grafana
+- Dashboards em tempo real
+- Apache Avro completo com Schema Registry
 - Apache Spark Streaming
-- Apache Flink processing
-- Data Lake integration (S3 / MinIO)
-- Kubernetes deployment
-- Prometheus observability
-- Dead Letter Queue (DLQ) implementation
+- Apache Flink
+- Data Lake (S3/MinIO)
+- Kubernetes Deployment
+- Observabilidade com Prometheus
 
 ---
 
-# 🏗 Key Concepts Demonstrated
+# 👨‍💻 Autor
 
-- Change Data Capture (CDC)
-- Event-Driven Architecture
-- Data Streaming
-- Kafka Messaging
-- Database Replication
-- Analytics Data Pipeline
-- Real-Time Processing
-- Microservices Integration
-
----
-
-# 👨‍💻 Author
-
-Built as a practical demonstration of a modern CDC architecture using:
+Desenvolvido para demonstrar uma arquitetura moderna de CDC baseada em eventos utilizando:
 
 - PostgreSQL
 - Debezium
-- Apache Kafka
+- Kafka
 - Python
-- Docker
 
 ---
-
-## ⭐ If you found this project useful, consider giving it a star.
