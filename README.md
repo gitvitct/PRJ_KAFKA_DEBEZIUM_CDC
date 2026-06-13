@@ -23,6 +23,9 @@ PostgreSQL (OLTP)
         │
         ▼
 PostgreSQL Analytics
+        │
+        ▼
+Grafana CDC Dashboard
 ```
 
 ---
@@ -39,6 +42,7 @@ PostgreSQL Analytics
 - Confluent Kafka
 - Psycopg2
 - Docker Compose
+- Grafana
 
 ---
 
@@ -62,6 +66,17 @@ kafka-cdc-platform/
 │
 ├── schemas/
 │   └── users.avsc
+│ 
+├── grafana/
+│   ├── dashboards/
+│   │   └── cdc_dashboard.json
+│   │
+│   └── provisioning/
+│       ├── dashboards/
+│       │   └── dashboard.yml
+│       │
+│       └── datasources/
+│           └── datasource.yml
 │
 ├── src/
 │   ├── consumer/
@@ -198,6 +213,26 @@ python src/consumer/cli.py
 ```
 
 ---
+
+## 📊 Grafana Dashboard
+
+The project includes a pre-configured Grafana dashboard for CDC monitoring.
+
+### Dashboard Features
+
+- Total CDC Events
+- Total Inserts
+- Total Updates
+- Total Deletes
+- Last Event Received
+- Events by Operation
+- Events by Source Table
+- Events Per Minute
+- CDC Timeline
+- Latest CDC Events
+
+---
+
 
 # 🧪 Testing CDC
 

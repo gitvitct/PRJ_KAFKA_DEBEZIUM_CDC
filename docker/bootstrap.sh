@@ -8,52 +8,38 @@ echo "========================================="
 
 cat <<EOF > .env
 # =========================
-# POSTGRES
+# PostgreSQL CDC
 # =========================
 
-POSTGRES_USER=admin
-POSTGRES_PASSWORD=admin
-POSTGRES_HOST=postgres
-POSTGRES_PORT=5432
-POSTGRES_SCHEMA=public
-POSTGRES_DB=POSTGRES_DB
+CDC_POSTGRES_HOST=postgres
+CDC_POSTGRES_USER=postgres
+CDC_POSTGRES_PASSWORD=postgres
+CDC_POSTGRES_PORT=5432
+CDC_POSTGRES_SCHEMA=public
+CDC_POSTGRES_DB=app_db
+
+CDC_TOPIC_PREFIX=cdc				
 
 # =========================
-# AIRFLOW METADATA DB
+# PostgreSQL Analytics
 # =========================
 
-AIRFLOW_DB=airflow
+ANL_POSTGRES_HOST=postgres
+ANL_POSTGRES_USER=analytics
+ANL_POSTGRES_PASSWORD=analytics
+ANL_POSTGRES_PORT=5433
+ANL_POSTGRES_SCHEMA=public
+ANL_POSTGRES_DB=analytics_db
 
 # =========================
-# DATA WAREHOUSE DB
+# GRAFANA
 # =========================
 
-DW_DB=sales_dw
-
-# =========================
-# DBT
-# =========================
-
-DBT_TARGET=dev
-DBT_THREADS=2
+GF_SECURITY_ADMIN_USER= admin
+GF_SECURITY_ADMIN_PASSWORD= admin
 EOF
 
 echo ".env criado com sucesso."
-
-echo ""
-echo "========================================="
-echo "Ajustando permissões do dbt"
-echo "========================================="
-
-sudo chown -R 50000:root ../dbt_project/
-
-
-echo ""
-echo "========================================="
-echo "Ajustando permissões do LOG"
-echo "========================================="
-
-sudo chown -R 50000:root ../logs/
 
 
 echo ""
@@ -65,39 +51,35 @@ docker compose up -d
 
 echo ""
 echo "========================================="
-echo "Aguardando Airflow inicializar"
+echo "Aguardando Kafka Connect iniciar..."
 echo "========================================="
 
-echo "Aguardando banco do Airflow..."
-
-until docker exec docker-airflow-scheduler-1 airflow db check >/dev/null 2>&1
+#until curl -s http://kafka-connect:8083/connectors > /dev/null
+until curl -s http://localhost:8083/connectors > /dev/null
 do
-    echo "Aguardando Airflow..."
-    sleep 5
+  echo "Kafka Connect ainda não disponível..."
+  sleep 5
 done
 
 echo ""
 echo "========================================="
-echo "Criando usuário Airflow"
+echo "Registrando conector Debezium..."
 echo "========================================="
 
-docker exec -i docker-airflow-webserver-1 airflow users create \
-    --username airflow \
-    --firstname F_name \
-    --lastname L_name \
-    --role Admin \
-    --email admin@email.com \
-    --password airflow
+curl -X POST \
+-H "Content-Type: application/json" \
+http://localhost:8083/connectors \
+-d @connect/debezium-connector.json	
+
+echo "Conector registrado!"
 
 echo ""
 echo "========================================="
 echo "Bootstrap concluído"
 echo "========================================="
 echo ""
-echo "Airflow:"
-echo "  URL      : http://localhost:8080"
-echo "  Usuário  : airflow"
-echo "  Senha    : airflow"
+echo "Grafana:"
+echo "  URL      : http://localhost:3000"
+echo "  Usuário  : admin"
+echo "  Senha    : admin"
 echo ""
-echo "pgAdmin:"
-echo "  URL      : http://localhost:5050"
