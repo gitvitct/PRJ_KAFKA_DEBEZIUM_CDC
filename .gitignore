@@ -14,7 +14,8 @@ dbt_packages/
 .idea/
 .vscode/
 
-data/deadletter/
+tests/
+src/util/
 
 project_KAFKA_CDC_docs.zip
 
