@@ -1,56 +1,101 @@
-# 🚀 Kafka CDC Analytics Platform
+# 🚀 Real-Time CDC Platform with PostgreSQL, Debezium, Kafka, Python, and Grafana
 
-A Change Data Capture (CDC) platform built with PostgreSQL, Debezium, Apache Kafka, and PostgreSQL Analytics.
+A Data Engineering project demonstrating a complete Change Data Capture (CDC) pipeline using PostgreSQL, Debezium, Apache Kafka, Python, and Grafana.
 
-This project demonstrates an event-driven architecture capable of capturing database changes in real time, streaming them through Kafka, and storing them in an analytical database for further processing and reporting.
+This solution captures database changes in real time from PostgreSQL transaction logs (WAL), streams them through Kafka, processes them with Python consumers, and stores operational metrics for monitoring and analytics.
 
 ---
 
-# 📐 Architecture
+# 📖 Overview
+
+Modern data platforms increasingly rely on event-driven architectures to move data in real time.
+
+This project demonstrates how to:
+
+- Capture database changes using CDC
+- Stream events through Apache Kafka
+- Process events with Python
+- Store analytics data
+- Monitor the entire pipeline with Grafana
+- Deploy everything using Docker Compose
+
+---
+
+# 🏗 Architecture
 
 ```text
-PostgreSQL (OLTP)
-        │
-        │ CDC (WAL)
-        ▼
-    Debezium
-        │
-        ▼
-      Kafka
-        │
-        ▼
- Python Consumer
-        │
-        ▼
-PostgreSQL Analytics
-        │
-        ▼
-Grafana CDC Dashboard
+┌─────────────────────┐
+│ PostgreSQL (OLTP)   │
+└──────────┬──────────┘
+           │
+           │ WAL (Logical Replication)
+           ▼
+┌─────────────────────┐
+│      Debezium       │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│       Kafka         │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   Python Consumer   │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ Analytics Database  │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│      Grafana        │
+└─────────────────────┘
 ```
 
 ---
 
-# 🛠 Technologies
+# 🎯 Project Goals
 
-- PostgreSQL 15
+This project demonstrates practical experience with:
+
+- Change Data Capture (CDC)
+- Event-Driven Architecture
 - Apache Kafka
-- Apache Zookeeper
 - Debezium
 - Kafka Connect
 - Schema Registry
-- Python 3
-- Confluent Kafka
-- Psycopg2
+- PostgreSQL Logical Replication
 - Docker Compose
-- Grafana
+- Python Event Processing
+- Data Observability
+- Real-Time Analytics
+
+---
+
+# 🛠 Technology Stack
+
+| Component | Technology |
+|------------|------------|
+| Source Database | PostgreSQL 15 |
+| CDC Engine | Debezium |
+| Streaming Platform | Apache Kafka |
+| Coordination | ZooKeeper |
+| Connector Framework | Kafka Connect |
+| Schema Management | Confluent Schema Registry |
+| Event Consumer | Python |
+| Monitoring | Grafana |
+| Containerization | Docker Compose |
 
 ---
 
 # 📂 Project Structure
 
 ```text
-kafka-cdc-platform/
-│
+project/
+
 ├── docker/
 │   ├── docker-compose.yml
 │   ├── bootstrap.sh
@@ -62,131 +107,53 @@ kafka-cdc-platform/
 │   │   └── init.sql
 │   │
 │   └── connect/
-│       └── debezium-connector.json
+│       ├── debezium-connector.json
+│       └── debezium-connector-avro.json
 │
 ├── schemas/
 │   └── users.avsc
-│ 
+│
 ├── grafana/
 │   ├── dashboards/
-│   │   └── cdc_dashboard.json
-│   │
 │   └── provisioning/
-│       ├── dashboards/
-│       │   └── dashboard.yml
-│       │
-│       └── datasources/
-│           └── datasource.yml
 │
 ├── src/
 │   ├── consumer/
-│   │   ├── cli.py
-│   │   ├── kafka_consumer.py
-│   │   ├── analytics_writer.py
-│   │   ├── avro_deserializer.py
-│   │   └── config.py
-│   │
+│   ├── generator/
 │   ├── producer/
-│   │   └── mock_writer.py
-│   │
 │   └── utils/
-│       ├── logger.py
-│       └── json_formatter.py
 │
 └── README.md
 ```
 
 ---
 
-# 🎯 Project Goal
-
-Capture changes from the following PostgreSQL table:
-
-```sql
-public.users
-```
-
-and transform them into Kafka events using Debezium.
-
-These events are consumed by a Python application and stored in an analytics database for auditing, reporting, and real-time data processing.
-
----
-
-# 🔄 Data Flow
-
-### 1. Insert or Update Data
-
-```sql
-INSERT INTO users(name, email)
-VALUES ('John Doe', 'john@example.com');
-```
-
-### 2. Debezium Captures the Change
-
-Debezium monitors PostgreSQL's Write-Ahead Log (WAL) and detects database changes.
-
-### 3. Event Published to Kafka
-
-Topic:
-
-```text
-cdc.public.users
-```
-
-### 4. Python Consumer Processes the Event
-
-The consumer application:
-
-- Reads messages from Kafka
-- Identifies the operation type (Create, Update, Delete)
-- Extracts relevant payload data
-- Persists the event into the analytics database
-
-### 5. Event Stored for Analytics
-
-Target table:
-
-```sql
-cdc_events
-```
-
----
-
-# 📦 Docker Services
-
-The Docker environment automatically starts:
-
-| Service | Port |
-|----------|---------|
-| PostgreSQL CDC | 5432 |
-| PostgreSQL Analytics | 5433 |
-| Kafka Broker | 9092 |
-| Zookeeper | 2181 |
-| Schema Registry | 8081 |
-| Kafka Connect | 8083 |
-
----
-
 # 🚀 Getting Started
 
-## 1. Clone the Repository
+## Prerequisites
 
-```bash
-git clone <repository-url>
-cd kafka-cdc-platform
-```
+- Docker
+- Docker Compose
+- Python 3.11+
+- Git
 
 ---
 
-## 2. Start the Infrastructure
+# 📦 Start the Environment
+
+Navigate to the Docker directory:
 
 ```bash
 cd docker
+```
 
+Start all services:
+
+```bash
 docker compose up -d
 ```
 
-Verify all containers are running:
+Verify containers:
 
 ```bash
 docker ps
@@ -194,9 +161,41 @@ docker ps
 
 ---
 
-## 3. Register the Debezium Connector
+# ⚡ Bootstrap
 
-If not automatically registered:
+The project includes a bootstrap script responsible for:
+
+- Waiting for all services to become healthy
+- Registering Debezium connectors
+- Validating Kafka Connect availability
+- Initializing CDC configuration
+
+Run:
+
+```bash
+chmod +x bootstrap.sh
+
+./bootstrap.sh
+```
+
+---
+
+# 🌐 Available Services
+
+| Service | URL / Port |
+|----------|------------|
+| PostgreSQL CDC | localhost:5432 |
+| PostgreSQL Analytics | localhost:5433 |
+| Kafka Broker | localhost:9092 |
+| Kafka Connect | localhost:8083 |
+| Schema Registry | localhost:8081 |
+| Grafana | localhost:3000 |
+
+---
+
+# 🔧 Register Debezium Connector
+
+If manual registration is required:
 
 ```bash
 curl -X POST http://localhost:8083/connectors \
@@ -204,161 +203,371 @@ curl -X POST http://localhost:8083/connectors \
 -d @connect/debezium-connector.json
 ```
 
----
-
-## 4. Start the Consumer
+Verify:
 
 ```bash
-python src/consumer/cli.py
+curl http://localhost:8083/connectors
+```
+
+Expected:
+
+```json
+[
+  "postgres-users-connector"
+]
 ```
 
 ---
 
-## 📊 Grafana Dashboard
+# 🗄 Source Table
 
-The project includes a pre-configured Grafana dashboard for CDC monitoring.
+The CDC process monitors the following table:
 
-### Dashboard Features
-
-- Total CDC Events
-- Total Inserts
-- Total Updates
-- Total Deletes
-- Last Event Received
-- Events by Operation
-- Events by Source Table
-- Events Per Minute
-- CDC Timeline
-- Latest CDC Events
+```sql
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+```
 
 ---
 
+# 🔄 CDC Event Flow
 
-# 🧪 Testing CDC
-
-Connect to PostgreSQL:
-
-```bash
-docker exec -it postgres_cdc psql -U postgres -d app_db
-```
-
-Create a record:
+## INSERT
 
 ```sql
 INSERT INTO users(name,email)
-VALUES ('Maria','maria@example.com');
+VALUES ('John Doe','john@example.com');
 ```
 
-Update a record:
+Expected Debezium Operation:
+
+```json
+{
+  "op":"c"
+}
+```
+
+---
+
+## UPDATE
 
 ```sql
 UPDATE users
-SET email='updated@example.com'
+SET email='new_email@example.com'
 WHERE id=1;
 ```
 
-Delete a record:
+Expected Operation:
+
+```json
+{
+  "op":"u"
+}
+```
+
+---
+
+## DELETE
 
 ```sql
 DELETE FROM users
 WHERE id=1;
 ```
 
----
-
-# 📥 Sample Debezium Event
+Expected Operation:
 
 ```json
 {
-  "payload": {
-    "before": null,
-    "after": {
-      "id": 1,
-      "name": "Maria",
-      "email": "maria@example.com"
-    },
-    "op": "c",
-    "source": {
-      "table": "users"
-    }
-  }
+  "op":"d"
 }
 ```
 
 ---
 
-# 📊 Analytics Database
+# 📡 Kafka Topics
 
-All captured events are stored in:
+List all topics:
 
-```sql
-cdc_events
+```bash
+docker exec kafka kafka-topics \
+--bootstrap-server localhost:9092 \
+--list
 ```
 
-Schema example:
+Expected topic:
 
-```sql
-CREATE TABLE cdc_events (
-    id SERIAL PRIMARY KEY,
-    operation VARCHAR(10),
-    source_table VARCHAR(100),
-    record_id INTEGER,
-    payload JSONB,
-    created_at TIMESTAMP DEFAULT NOW()
-);
+```text
+cdc.public.users
 ```
 
 ---
 
-# 🔍 Captured Operations
+# 📥 Consume Events
 
-| Code | Operation |
-|--------|-----------|
-| c | Create |
+Run the consumer:
+
+```bash
+python src/consumer/main.py
+```
+
+Or inspect logs:
+
+```bash
+docker logs -f consumer
+```
+
+---
+
+# 🧪 CDC Validation Tests
+
+## Test 1 – Connector Status
+
+```bash
+curl http://localhost:8083/connectors/postgres-users-connector/status
+```
+
+Expected:
+
+```json
+"RUNNING"
+```
+
+---
+
+## Test 2 – Verify Topic Creation
+
+```bash
+docker exec kafka kafka-topics \
+--bootstrap-server localhost:9092 \
+--list
+```
+
+Expected:
+
+```text
+cdc.public.users
+```
+
+---
+
+## Test 3 – INSERT Event
+
+Execute:
+
+```sql
+INSERT INTO users(name,email)
+VALUES ('CDC TEST','cdc@test.com');
+```
+
+Consume messages:
+
+```bash
+docker exec kafka kafka-console-consumer \
+--bootstrap-server localhost:9092 \
+--topic cdc.public.users \
+--from-beginning
+```
+
+Expected:
+
+```json
+"op":"c"
+```
+
+---
+
+## Test 4 – UPDATE Event
+
+Execute:
+
+```sql
+UPDATE users
+SET email='updated@test.com'
+WHERE id=1;
+```
+
+Expected:
+
+```json
+"op":"u"
+```
+
+---
+
+## Test 5 – DELETE Event
+
+Execute:
+
+```sql
+DELETE FROM users
+WHERE id=1;
+```
+
+Expected:
+
+```json
+"op":"d"
+```
+
+---
+
+## Test 6 – Verify Analytics Database
+
+Connect:
+
+```bash
+docker exec -it postgres_analytics psql \
+-U analytics \
+-d analytics_db
+```
+
+Query:
+
+```sql
+SELECT *
+FROM cdc_events
+ORDER BY created_at DESC;
+```
+
+Expected:
+
+Records generated from CDC events.
+
+---
+
+## Test 7 – Verify Grafana Dashboard
+
+Open:
+
+```text
+http://localhost:3000
+```
+
+Validate:
+
+- Total CDC Events
+- Insert Events
+- Update Events
+- Delete Events
+- Snapshot Events
+- Event Timeline
+- Latest CDC Activity
+
+---
+
+# 📊 Debezium Operation Codes
+
+| Code | Description |
+|--------|------------|
+| c | Create (INSERT) |
 | u | Update |
 | d | Delete |
-| r | Snapshot Read |
+| r | Snapshot |
 
 ---
 
-# ✨ Future Improvements
+# 🔍 Troubleshooting
 
-- Grafana dashboards
-- Real-time monitoring
-- Full Avro serialization support
-- Advanced Schema Registry integration
-- Apache Spark Streaming
-- Apache Flink processing
-- Data Lake integration (S3 / MinIO)
-- Kubernetes deployment
-- Prometheus observability
-- Dead Letter Queue (DLQ) implementation
+## Check PostgreSQL Logical Replication
+
+```sql
+SHOW wal_level;
+```
+
+Expected:
+
+```text
+logical
+```
 
 ---
 
-# 🏗 Key Concepts Demonstrated
+## Check Replication Slots
 
-- Change Data Capture (CDC)
-- Event-Driven Architecture
-- Data Streaming
-- Kafka Messaging
-- Database Replication
-- Analytics Data Pipeline
-- Real-Time Processing
-- Microservices Integration
+```sql
+SELECT * FROM pg_replication_slots;
+```
+
+Expected:
+
+```text
+debezium_slot
+```
+
+---
+
+## Check Kafka Connect Logs
+
+```bash
+docker logs kafka_connect
+```
+
+---
+
+## Check Kafka Topics
+
+```bash
+docker exec kafka kafka-topics \
+--bootstrap-server localhost:9092 \
+--list
+```
+
+---
+
+# 📈 Future Enhancements
+
+Potential extensions for a production-grade data platform:
+
+- Apache Spark Structured Streaming
+- PySpark Transformations
+- Data Lake (MinIO)
+- Delta Lake
+- Apache Airflow
+- dbt
+- Snowflake
+- Prometheus
+- Kubernetes
+- CI/CD with GitHub Actions
+- Dead Letter Queue (DLQ)
+- Data Quality Validation Framework
+
+---
+
+# 💼 Skills Demonstrated
+
+This project demonstrates hands-on experience with:
+
+- Apache Kafka
+- Debezium CDC
+- Kafka Connect
+- PostgreSQL
+- Event Streaming
+- Real-Time Data Pipelines
+- Docker
+- Python
+- Schema Registry
+- Avro
+- Data Engineering
+- Streaming Architectures
+- CDC Architectures
+- Data Observability
+- Grafana
 
 ---
 
 # 👨‍💻 Author
 
-Built as a practical demonstration of a modern CDC architecture using:
+Developed as a Data Engineering portfolio project focused on real-time streaming architectures and Change Data Capture (CDC).
+
+Core Stack:
 
 - PostgreSQL
 - Debezium
 - Apache Kafka
 - Python
 - Docker
-
----
-
-## ⭐ If you found this project useful, consider giving it a star.
+- Grafana
