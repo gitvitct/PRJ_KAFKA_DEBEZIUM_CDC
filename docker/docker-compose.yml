@@ -213,8 +213,16 @@ services:
 
     container_name: generator
 
+    environment:
+      CDC_POSTGRES_HOST: postgres
+      CDC_POSTGRES_DB: app_db
+      CDC_POSTGRES_USER: postgres
+      CDC_POSTGRES_PASSWORD: postgres
+      CDC_POSTGRES_PORT: 5432
+
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
 
     restart: unless-stopped
 
