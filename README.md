@@ -66,7 +66,6 @@ This project demonstrates practical experience with:
 - Apache Kafka
 - Debezium
 - Kafka Connect
-- Schema Registry
 - PostgreSQL Logical Replication
 - Docker Compose
 - Python Event Processing
@@ -518,25 +517,6 @@ docker exec kafka kafka-topics \
 
 ---
 
-# 📈 Future Enhancements
-
-Potential extensions for a production-grade data platform:
-
-- Apache Spark Structured Streaming
-- PySpark Transformations
-- Data Lake (MinIO)
-- Delta Lake
-- Apache Airflow
-- dbt
-- Snowflake
-- Prometheus
-- Kubernetes
-- CI/CD with GitHub Actions
-- Dead Letter Queue (DLQ)
-- Data Quality Validation Framework
-
----
-
 # 💼 Skills Demonstrated
 
 This project demonstrates hands-on experience with:
@@ -549,8 +529,6 @@ This project demonstrates hands-on experience with:
 - Real-Time Data Pipelines
 - Docker
 - Python
-- Schema Registry
-- Avro
 - Data Engineering
 - Streaming Architectures
 - CDC Architectures
